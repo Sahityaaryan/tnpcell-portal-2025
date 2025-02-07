@@ -4,11 +4,10 @@
   "info": {
     "singularName": "company",
     "pluralName": "companies",
-    "displayName": "Company",
-    "description": ""
+    "displayName": "Company"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {

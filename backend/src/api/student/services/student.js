@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * student service.
+ * student service
  */
 
 const { createCoreService } = require('@strapi/strapi').factories;

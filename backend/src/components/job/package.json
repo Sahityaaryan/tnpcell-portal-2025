@@ -1,22 +1,23 @@
 {
-  "collectionName": "components_job_packages",
-  "info": {
-    "displayName": "package",
-    "icon": "angle-right"
-  },
-  "options": {},
-  "attributes": {
-    "basic_salary": {
-      "type": "string"
+    "collectionName": "components_job_packages",
+    "info": {
+      "displayName": "package",
+      "icon": "angle-right"
     },
-    "allowance": {
-      "type": "text"
-    },
-    "perks": {
-      "type": "text"
-    },
-    "ctc": {
-      "type": "string"
+    "options": {},
+    "attributes": {
+      "basic_salary": {
+        "type": "string"
+      },
+      "allowance": {
+        "type": "text"
+      },
+      "perks": {
+        "type": "text"
+      },
+      "ctc": {
+        "type": "string"
+      }
     }
   }
-}
+  

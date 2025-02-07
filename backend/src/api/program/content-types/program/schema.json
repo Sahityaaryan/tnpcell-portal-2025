@@ -1,33 +1,34 @@
 {
-  "kind": "collectionType",
-  "collectionName": "programs",
-  "info": {
-    "singularName": "program",
-    "pluralName": "programs",
-    "displayName": "Program",
-    "description": ""
-  },
-  "options": {
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "program_name": {
-      "type": "string",
-      "required": true,
-      "unique": true
+    "kind": "collectionType",
+    "collectionName": "programs",
+    "info": {
+      "singularName": "program",
+      "pluralName": "programs",
+      "displayName": "Program",
+      "description": ""
     },
-    "students": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::student.student",
-      "mappedBy": "program"
+    "options": {
+      "draftAndPublish": false
     },
-    "courses": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::course.course",
-      "mappedBy": "program"
+    "pluginOptions": {},
+    "attributes": {
+      "program_name": {
+        "type": "string",
+        "required": true,
+        "unique": true
+      },
+      "students": {
+        "type": "relation",
+        "relation": "oneToMany",
+        "target": "api::student.student",
+        "mappedBy": "program"
+      },
+      "courses": {
+        "type": "relation",
+        "relation": "oneToMany",
+        "target": "api::course.course",
+        "mappedBy": "program"
+      }
     }
   }
-}
+  

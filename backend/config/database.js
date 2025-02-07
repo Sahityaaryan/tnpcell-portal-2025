@@ -1,37 +1,57 @@
-module.exports = ({ env }) => ({
+const path = require('path');
+
+module.exports = ({ env }) => {
+  const client = env('postgres', 'sqlite');
+
+  const connections = {
+    mysql: {
       connection: {
-        client: 'postgres',
-        connection: {
-          host: env('DATABASE_HOST', 'localhost'),
-          port: env.int('DATABASE_PORT', 1111),
-          database: env('DATABASE_NAME', 'name'),
-          user: env('DATABASE_USERNAME', 'username'),
-          password: env('DATABASE_PASSWORD', 'password'),
-          schema: env('DATABASE_SCHEMA', 'schema'), // Not required
-          // ssl: {
-          //   rejectUnauthorized: env.bool('DATABASE_SSL_SELF', false),
-          // },
+        host: env('DATABASE_HOST', 'localhost'),
+        port: env.int('DATABASE_PORT', 3306),
+        database: env('DATABASE_NAME', 'strapi'),
+        user: env('DATABASE_USERNAME', 'strapi'),
+        password: env('DATABASE_PASSWORD', 'strapi'),
+        ssl: env.bool('DATABASE_SSL', false) && {
+          key: env('DATABASE_SSL_KEY', undefined),
+          cert: env('DATABASE_SSL_CERT', undefined),
+          ca: env('DATABASE_SSL_CA', undefined),
+          capath: env('DATABASE_SSL_CAPATH', undefined),
+          cipher: env('DATABASE_SSL_CIPHER', undefined),
+          rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', true),
         },
-        debug: false,
       },
-    });
+      pool: { min: env.int('DATABASE_POOL_MIN', 2), max: env.int('DATABASE_POOL_MAX', 10) },
+    },
+    postgres: {
+      connection: {
+        connectionString: env('DATABASE_URL'),
+        host: env('DATABASE_HOST', 'localhost'),
 
-/*
+        port: env.int('DATABASE_PORT', 5432),
 
+        database: env('DATABASE_NAME', 'tnp-test'),
 
-The code is a configuration file in Node.js that exports a function 
+        user: env('DATABASE_USERNAME', 'postgres'),
 
-that returns an object that defines the database connection settings. 
+        password: env('DATABASE_PASSWORD', '2006001'),
 
-The function takes in an argument env, which is an object that allows access to the environment variables.
+        schema: env('DATABASE_SCHEMA', 'public'),
+      },
+      pool: { min: env.int('DATABASE_POOL_MIN', 2), max: env.int('DATABASE_POOL_MAX', 10) },
+    },
+    sqlite: {
+      connection: {
+        filename: path.join(__dirname, '..', env('DATABASE_FILENAME', '.tmp/data.db')),
+      },
+      useNullAsDefault: true,
+    },
+  };
 
-The returned object sets the client for the database connection to SQLite and sets the connection settings 
-to use a file named data.db located in a .tmp directory within the same directory as this configuration file.
-  
-If the environment variable DATABASE_FILENAME is set, the code uses that value instead of the default file name.
-
-The useNullAsDefault property is set to true, indicating that SQLite should use NULL as the default value for
-
-new columns that don't have a specified default value.
-
-*/
+  return {
+    connection: {
+      client,
+      ...connections[client],
+      acquireConnectionTimeout: env.int('DATABASE_CONNECTION_TIMEOUT', 60000),
+    },
+  };
+};

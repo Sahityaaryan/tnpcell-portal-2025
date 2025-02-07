@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
@@ -23,7 +23,7 @@
     "gender": {
       "type": "enumeration",
       "enum": [
-        "male",
+        "male ",
         "female",
         "other"
       ],
@@ -35,28 +35,25 @@
         "general",
         "obc",
         "sc",
-        "st",
-        "ews"
+        "st"
       ],
       "required": true
     },
     "institute_email_id": {
       "type": "email",
-      "unique": true,
-      "required": true
+      "required": true,
+      "unique": true
     },
     "personal_email_id": {
       "type": "email",
-      "unique": true,
-      "required": false
+      "unique": true
     },
     "resume": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
       "allowedTypes": [
         "files"
-      ]
+      ],
+      "type": "media",
+      "multiple": false
     },
     "resume_link": {
       "type": "string"
