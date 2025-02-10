@@ -4,11 +4,16 @@ Welcome contributors, this is the official site of the Training-Placement-Cell.
 This is the setup-guide for this project.
 
 
+## Setup
+
+1. Make sure you are using Node.js of version 18.20.2. (use nvm to manage different node versions).
+
+
 ## Backend-setup
 
 1. Navigate to : *backend/config/database.js*
 		and apply these changes
-		
+
 ```
 connection: {
 host: env('DATABASE_HOST', 'localhost'),
@@ -21,7 +26,7 @@ user: env('DATABASE_USERNAME', 'postgres'),
 
 password: env('DATABASE_PASSWORD', '2006001'),
 
-schema: env('DATABASE_SCHEMA', 'public'), 
+schema: env('DATABASE_SCHEMA', 'public'),
 
 }
 ```
@@ -65,11 +70,11 @@ process.env.NEXT_PUBLIC_FRONTEND_URL || 'http:localhost:3000'
 
 1. Firstly, you have to signup to the strapi,
 
-2. Navigate to: *Settings/Roles*: it will look like [this](https://i.imgur.com/9hAhJyI.png) 
+2. Navigate to: *Settings/Roles*: it will look like [this](https://i.imgur.com/9hAhJyI.png)
 
 3. Now for [roles and permissions configuration](https://docs.google.com/document/d/1D64h39SjRC3-Fcw2RU-U49l82BDDOIVuUudIiUJ9YNk/edit?usp=sharing):
 
-4. Content Manager: 
+4. Content Manager:
 	photo:
 
 5. Create some users of different profile (like coordinator, student etc.)  under "user" relation.
