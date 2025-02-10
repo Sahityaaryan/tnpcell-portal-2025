@@ -7,7 +7,7 @@ This is the setup-guide for this project.
 ## Setup
 
 1. Make sure you are using Node.js of version 18.20.2. (use nvm to manage different node versions).
-
+2. Make sure to
 
 ## Backend-setup
 
@@ -36,6 +36,26 @@ schema: env('DATABASE_SCHEMA', 'public'),
 		and apply these changes
 ```
 host: env('HOST', 'localhost'),
+```
+
+3. Create .env file
+```
+HOST=localhost
+PORT=1337
+
+# Secrets
+APP_KEYS=htzTPsYd9S8HVDYLjEV0Mw==,Xos98t1DExntHOWYp+Lsig==,z/FD+o/7CssFOCazeyMZMg==,tqs9jxpDd377JJN0S7pzLQ==
+API_TOKEN_SALT=5xi9yU2NklJyFjF79zvPkQ==
+ADMIN_JWT_SECRET=YCn/lssPBQuSjxbHSD80Kw==
+TRANSFER_TOKEN_SALT=ZSKh7W78CBgaz04bfkwr6Q==
+
+# Database
+JWT_SECRET=YjPGJL+7T85jr1SSEkPAPA==
+STUDENT_API_TOKEN=2f2e7a78d90d22e4588f5e60476a4f414b06a83573faa39c46d624d1963421ca6121a6c62d3f51d6281646c9a146d8e059328289e8c44f0bf68e3e9ec0fb2c26ea95c609dda2b2427195e1478e24f4e359994865d8142001a2e0d7d5b4d067fd8344e5d0fc7aaef5251c863106d529e7677c84dd
+DATABASE_NAME=tnp-test
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=2006001
+DATABASE_SCHEMA=public
 ```
 
 3. To run backend:
