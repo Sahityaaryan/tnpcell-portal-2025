@@ -67,6 +67,7 @@ export default function Sidebar({ heading = '', children }) {
   const { user, logout } = useContext(AuthContext)
   const [profilePicUrl, setProfilePicUrl] = useState('')
   const getProfilePicUrl = async () => {
+   try {
     const resp = await axios.post(`${API_URL}/api/students/profile-pic-url`, {
       headers: {
         'Content-Type': 'application/json',
@@ -75,6 +76,9 @@ export default function Sidebar({ heading = '', children }) {
       email: user?.email
     })
     setProfilePicUrl(resp.data?.profilePicUrl?.url)
+   } catch (err) {
+      console.log("error: ", err.message);
+   }
   }
   useEffect(() => {
     getProfilePicUrl()
