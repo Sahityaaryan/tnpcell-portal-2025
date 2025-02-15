@@ -108,31 +108,15 @@ export default function Profile({ student, token }) {
     setStudentData({ ...studentData, [e.target.name]: e.target.value });
   };
 
-  useEffect(() => {
-    fetch(`${API_URL}/api/setting`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setEditCpi(data.data.attributes.cpi_change_allowed);
-      })
-
-      .catch((err) => {
-        console.log(err);
-        toast.error(
-          "Unable to fetch data from setting !!! api/setting not working"
-        );
-      });
-  }, []);
-
   const handleSubmit = async (e) => {
+   try {
     e.preventDefault();
     const formData = new FormData();
 
     formData.append("profile_pic", profilePic);
+    console.log("profile pic: ", profilePic);
+
+    console.log("formData: ", formData)
 
     const res = await fetch(`${API_URL}/api/student/modify`, {
       method: "PUT",
@@ -142,13 +126,39 @@ export default function Profile({ student, token }) {
       body: formData,
     });
 
+    console.log("res: ", res);
+
     if (res.ok) {
       toast.success("Successfully Updated");
       router.push("/student/profile");
     } else {
       toast.error("Something Went Wrong");
     }
+   } catch (err) {
+    console.log("error while updating profile: ", err);
+   }
   };
+
+  useEffect(() => {
+    
+    fetch(`${API_URL}/api/setting`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setEditCpi(data?.data?.cpi_change_allowed);
+      })
+
+      .catch((err) => {
+        console.log(err);
+        toast.error(
+          "Unable to fetch data from setting !!! api/setting not working"
+        );
+      });
+  }, []);
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg mt-4">

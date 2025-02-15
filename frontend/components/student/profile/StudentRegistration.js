@@ -156,6 +156,8 @@ export default function StudentRegistration({ token = '' }) {
   //     mtech_YOP:''
   // })
 
+  const [programs, setPrograms] = useState([])
+  const [courses, setCourses] = useState([])
   const router = useRouter()
   const { user } = useContext(AuthContext)
   if (user && user.username) {
@@ -164,11 +166,6 @@ export default function StudentRegistration({ token = '' }) {
   }
 
   const [isMtech, setIsMtech] = useState(false);
-
-  // // const [flag,setFlag] = useState(true);
-  // const enterAddress= (e)=>{
-  //   e.target.value
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -179,6 +176,8 @@ export default function StudentRegistration({ token = '' }) {
 
     // })
 
+    console.log("course: ", values)
+    // return;  
 
     if (confirm('Are you sure you want to submit for approval?')) {
       const res = await fetch(`${API_URL}/api/student/submit-for-approval`, {
@@ -198,6 +197,7 @@ export default function StudentRegistration({ token = '' }) {
           return
         }
         const profile = await res.json()
+        console.log("validation error:  ", profile?.error?.message); // for smart devs to debug on there own
         toast.error(profile?.error.name)
       } else {
         const profile = await res.json()
@@ -210,6 +210,7 @@ export default function StudentRegistration({ token = '' }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log("name: ", name, " value: ", value);
     setValues({ ...values, [name]: value });
   }
   //function to handle pwd checkbox
@@ -217,11 +218,6 @@ export default function StudentRegistration({ token = '' }) {
     const { name, value } = e.target
     setValues({ ...values, [name]: !values.pwd })
   }
-
-
-  const [programs, setPrograms] = useState([])
-
-  const [courses, setCourses] = useState([])
 
   //get courses of selected program
 
@@ -234,6 +230,7 @@ export default function StudentRegistration({ token = '' }) {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("programs: ", data.data);
         setPrograms(data?.data)
       })
   }, [])
@@ -272,7 +269,8 @@ export default function StudentRegistration({ token = '' }) {
   useEffect(() => {
     programs.map((program) => {
       if (program.id === parseFloat(values.program)) {
-        setCourses(program?.attributes?.courses?.data)
+        console.log("courses: ", program)
+        setCourses(program?.courses)
       }
     })
   }, [values?.program])
@@ -472,7 +470,7 @@ export default function StudentRegistration({ token = '' }) {
                     required
                   >
                     Mobile Number 1<span className='text-red-700'>*</span>
-                  </label>
+                  </label>male
                   <input
                     value={values.mobile_number_1}
                     onChange={handleInputChange}
@@ -528,7 +526,7 @@ export default function StudentRegistration({ token = '' }) {
                     <option value=''>Select</option>
                     <option value='female'>female</option>
                     <option value='male'>male</option>
-                    <option value=''>other</option>
+                    <option value='other'>other</option>
                   </select>
                 </div>
                 <div className='col-span-4 sm:col-span-1'>
@@ -1123,7 +1121,7 @@ export default function StudentRegistration({ token = '' }) {
                   <option value=''>Select</option>
                   {programs.map((program) => (
                     <option key={program.id} value={program.id}>
-                      {program.attributes.program_name}
+                      {program.program_name}
                     </option>
                   ))}
                 </select>
@@ -1147,7 +1145,7 @@ export default function StudentRegistration({ token = '' }) {
                   <option value=''>Select Course</option>
                   {courses?.map((course) => (
                     <option key={course.id} value={course.id}>
-                      {course.attributes.course_name}
+                      {course.course_name}
                     </option>
                   ))}
                 </select>
@@ -1755,8 +1753,8 @@ export default function StudentRegistration({ token = '' }) {
               <div className='col-span-5 sm:col-span-2'>
 
                 <div className="flex items-center ps-4 border border-gray-200 rounded-xl dark:border-gray-700">
-                  <input id="bordered-checkbox-1" type="checkbox" value={values.is_mtech} name="bordered-checkbox" onChange={(e) => { setIsMtech(e.target.checked); }} clxzassName="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 m-1  mx-2 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                  <label for="bordered-checkbox-1" className="w-full py-4 ms-2 text-sm font-Medium text-black dark:text-black">Are You a M.Tech Student</label>
+                  <input id="bordered-checkbox-1" type="checkbox" value={values.is_mtech} name="bordered-checkbox" onChange={(e) => { setIsMtech(e.target.checked); }} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 m-1  mx-2 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                  <label htmlFor="bordered-checkbox-1" className="w-full py-4 ms-2 text-sm font-Medium text-black dark:text-black">Are You a M.Tech Student</label>
 
                 </div>
               </div>
