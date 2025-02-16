@@ -835,7 +835,7 @@ export interface ApiStudentStudent extends Struct.CollectionTypeSchema {
     father_name: Schema.Attribute.String;
     father_occupation: Schema.Attribute.String;
     fte_status: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    gender: Schema.Attribute.Enumeration<['male ', 'female', 'other']> &
+    gender: Schema.Attribute.Enumeration<['male', 'female', 'other']> &
       Schema.Attribute.Required;
     height: Schema.Attribute.Decimal;
     institute_email_id: Schema.Attribute.Email &
