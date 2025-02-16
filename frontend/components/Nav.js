@@ -36,7 +36,7 @@ export default function Nav() {
       const res = await axios.get(`${API_URL}/api/setting?populate=*`);
       const data = res.data.data;
       // console.log(res);
-      setTpcGuidelines(data.attributes.tpc_guidelines.data.attributes.url);
+      setTpcGuidelines(data?.tpc_guidelines.data?.url);
     } catch (err) {
       // toast.error('Error fetching TPC Guidelines')
       console.log(err);
