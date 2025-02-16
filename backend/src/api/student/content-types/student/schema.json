@@ -23,7 +23,7 @@
     "gender": {
       "type": "enumeration",
       "enum": [
-        "male ",
+        "male",
         "female",
         "other"
       ],
