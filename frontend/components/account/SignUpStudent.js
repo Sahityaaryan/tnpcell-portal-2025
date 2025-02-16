@@ -18,7 +18,7 @@ export default function SignUpStudent() {
     fetch(`${API_URL}/api/setting`)
       .then((res) => res.json())
       .then((data) => {
-        setAllowNewReg(data.data?.attributes?.registrations_allowed);
+        setAllowNewReg(data.data?.registrations_allowed);
       })
       .catch((err) => {
         console.log(err);
