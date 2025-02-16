@@ -9,7 +9,6 @@
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const utils = require('@strapi/utils');
-
 const { sanitize } = utils;
 const { ApplicationError, ValidationError } = utils.errors;
 
@@ -43,9 +42,10 @@ const emailRegExp = /^[a-zA-Z0-9._]+@nitp\.ac\.in$/;
 // Username should be a number of 7 digit
 // if current year is 2023, then users of year 2019, 2020, 2021 are allowed so first 2 digits of username should be either 19, 20 or 21 and last 4 digit can be any.
 // so usernames can be of type 19____, 20____, 21____
-
-const userNameRegExp = /^(19|20|21|23)\d{5}$/;
-
+let date = new Date();
+let year = date.getFullYear()-2000;
+let startOfAllowedYear = year-4;
+const userNameRegExp = new RegExp(`^(${startOfAllowedYear}|${startOfAllowedYear + 1}|${startOfAllowedYear + 2})\\d{5}$`);
 
 async function sanitizeUser(user, ctx) {
   // NOTE: @adig Returning role too, with the user
@@ -53,7 +53,7 @@ async function sanitizeUser(user, ctx) {
   const { auth } = ctx.state;
   const userSchema = strapi.getModel('plugin::users-permissions.user');
 
-  return { role, ...(await sanitize.contentAPI.output(user, userSchema, { auth })) };
+  return { role, ...(await strapi.contentAPI.sanitize.output(user, userSchema, { auth })) };
 };
 
 // validation
@@ -79,6 +79,18 @@ function issueJWT(payload, jwtOptions = {}) {
 const getService = name => {
   return strapi.plugin('users-permissions').service(name);
 };
+
+// An alternative of isHashed function which can detect whether the given string contains more than 3 '$' character
+
+function isHashed(str){
+  const regex = /\$.*?\$.*?\$.*?\$.*?/;
+
+  if(typeof(str) === 'string'){
+    return regex.test(str);
+  }
+  return false;
+}
+
 
 module.exports = {
   /**
@@ -116,7 +128,7 @@ module.exports = {
     // Throw an error if the password selected by the user
     // contains more than three times the symbol '$'.
     if (
-      strapi.service('plugin::users-permissions.user').isHashed(params.password)
+      isHashed(params.password)
     ) {
       throw new ValidationError(
         'Your password cannot contain more than three times the symbol `$`'
@@ -183,8 +195,8 @@ module.exports = {
        * .create({ data: params, populate: ["role"] });
        */
 
-      const sanitizedUser = await sanitizeUser(user, ctx);
       // console.log('User Data', user);
+      const sanitizedUser = await sanitizeUser(user, ctx);
 
       if (settings.email_confirmation) {
         try {
