@@ -26,11 +26,11 @@ module.exports = ({ env }) => {
       connection: {
         connectionString: env('DATABASE_URL'),
         host: env('DATABASE_HOST', 'localhost'),
-        port: env.int('DATABASE_PORT', 5432),
-        database: env('DATABASE_NAME', 'tnp-test'),
-        user: env('DATABASE_USERNAME', 'postgres'),
-        password: env('DATABASE_PASSWORD', '2006001'),
-        schema: env('DATABASE_SCHEMA', 'public'),
+          port: env.int('DATABASE_PORT', 1111),
+          database: env('DATABASE_NAME', 'name'),
+          user: env('DATABASE_USERNAME', 'username'),
+          password: env('DATABASE_PASSWORD', 'password'),
+          schema: env('DATABASE_SCHEMA', 'schema'), // Not required
       },
       pool: { min: env.int('DATABASE_POOL_MIN', 2), max: env.int('DATABASE_POOL_MAX', 10) },
     },
