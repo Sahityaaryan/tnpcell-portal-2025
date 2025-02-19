@@ -114,9 +114,9 @@ export default function Profile({ student, token }) {
     const formData = new FormData();
 
     formData.append("profile_pic", profilePic);
-    console.log("profile pic: ", profilePic);
+    // console.log("profile pic: ", profilePic);
 
-    console.log("formData: ", formData)
+    // console.log("formData: ", formData)
 
     const res = await fetch(`${API_URL}/api/student/modify`, {
       method: "PUT",
