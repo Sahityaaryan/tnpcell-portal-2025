@@ -1,5 +1,6 @@
 import React from "react";
-import Lottie from "lottie-react";
+import dynamic from "next/dynamic";
+const Lottie = dynamic(()=>import("lottie-react"),{ssr:false})
 import eye from "public/lottie/eye.json";
 import aim from "public/lottie/aim.json";
 import mission from "public/lottie/mission.json";

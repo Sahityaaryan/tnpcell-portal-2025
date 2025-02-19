@@ -10,7 +10,8 @@ import {
 } from '@heroicons/react/solid'
 import AOS from 'aos';
 import 'aos/dist/aos.css'
-import Lottie from 'lottie-react';
+import dynamic from "next/dynamic";
+const Lottie = dynamic(()=>import("lottie-react"),{ssr:false})
 import culture from '/public/lottie/culture.json'
 import coding from '/public/lottie/coding.json'
 import workshop from '/public/lottie/workshop.json'
