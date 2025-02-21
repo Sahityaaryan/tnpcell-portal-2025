@@ -12,7 +12,7 @@
     "strapi": "strapi"
   },
   "dependencies": {
-    "@strapi/plugin-users-permissions": "5.9.0",
+    "@strapi/plugin-users-permissions": "^5.10.3",
     "@strapi/strapi": "5.9.0",
     "adm-zip": "^0.5.16",
     "better-sqlite3": "11.3.0",
@@ -27,7 +27,6 @@
     "sharp": "^0.33.5",
     "styled-components": "^6.0.0"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0 <=22.x.x",
     "npm": ">=6.0.0"

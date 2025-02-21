@@ -1,5 +1,7 @@
 "use strict";
 
+const { isEqual, isObject } = require("lodash/fp");
+
 /**
  *  student controller
  */
@@ -134,24 +136,37 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
   async modify_multiple(ctx) {
     const user = ctx.state.user;
 
+    
     if (!user) {
       return ctx.badRequest(null, [
         { messages: [{ id: "Bearer Token not provided or invalid" }] },
       ]);
     }
-
-    // console.log("Starting: ", { body: ctx.request.body, files: ctx.request.files, query: ctx.query });
-
+    
+    // console.log("Starting: ", { body: JSON.stringify(ctx.request.body), files: ctx.request.files, query: ctx.query });
+    
     const roll = user.username;
     const body = ctx.request.body;
+    const files = ctx.request.files;
+
+    // if(!body)console.log("no body")
+    //   if(typeof body !== "object") {
+    //     console.log(isObject(body))
+    //     console.log(typeof body)
+    //     console.log("It's not an object");
+    //   }
+
+
     if (!body || typeof body !== "object") {
+      // console.log("I am here")
       return ctx.badRequest(null, [
         { messages: [{ id: "Invalid parameters" }] },
       ]);
     }
-
+    
     // console.debug({body, files: ctx.request.files, query: ctx.query});
 
+   
     const student_data = await strapi.db.query("api::student.student").findOne({
       where: {
         roll: roll,
@@ -164,18 +179,20 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
         { messages: [{ id: "Failed to fetch student data" }] },
       ]);
     }
-
+    
     // Note: Intentionally not checking `approved`, since student can modify some fields
     const { id, approved } = student_data;
+    // console.log("id: ", id, " approved: ", approved)
+
 
     /**
      * NOTE TO FUTURE DEVELOPERS:
      *
      * Currently we filter fields based on below arrays, ie. if ANY key is not in this array, it will simply be ignored, and hence not modifiable
-     */
+    */
     // Most mandatory components locked after approval of the profile (ie. only allowed to change before approval).
     // CPI can be updated when allowed by admin
-
+    
     // NOTE: These are not allowed to change, since student has already "submitted for approval"
     const fields_allowed_before_approval = [
       "name",
@@ -192,7 +209,7 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       "ug_college",
       "ug_cpi",
     ];
-
+    
     // should include at least ALL optional fields
     const fields_allowed_anytime = [
       "resume_link",
@@ -200,6 +217,7 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       "projects",
       "transcript_link",
       "cover_letter_link",
+      "profile_pic",
     ];
 
     // Fields related to SPI and CPI, only allowed to be changed if Admin globally allows change to these
@@ -216,26 +234,28 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       "spi_10",
       "cpi",
     ];
-
+    
     // NOTE: ALL other fields (including invalid/unknown) are removed, and treated as immutable
     // for changing password, use forgot password
     // NOTE2: Other approach can be allowing all except some
     const fields_to_modify = {};
-
+    
     for (const field in body) {
-      // These fields will only be added to `fields_to_modify` if account is not already approved/rejected
+      // These fields will only be added to `fields_to_modify` if account is not already approved/rejected;
       if (fields_allowed_before_approval.includes(field)) {
         if (approved === "pending") {
           fields_to_modify[field] = body[field];
         } else {
+          // console.log("I aqm skipping something")
           continue; // skip modifying fields that are not allowed after "Submit for approval"
         }
       } else if (fields_allowed_anytime.includes(field)) {
         fields_to_modify[field] = body[field];
       }
     }
+    
 
-
+    
     /** Check if Administrator has allowed changing SPIs and CPIs */
     const setting = await strapi.query("api::setting.setting").findOne({
       where: {},
@@ -264,6 +284,8 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       }
     }
 
+    // console.log("fields to be modified: ", fields_to_modify);
+    
     /** All fields that take media
      * WHY: It is needed since from backend we are taking keys as, eg. "resume", but strapi's
      * update route requires this to be "files.resume", so instead of depending on frontend to
@@ -274,8 +296,9 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
      */
     const media_fields = ["resume", "profile_pic","casteCertificate", "tenthCertificate", "twelthCertificate", "aadharCard", "panCard", "drivingLicence", "disabilityCertificate", "allSemMarksheet"];
     const files_to_upload = {};
-    for (const field in ctx.request.files || {}) {
+    for (const field in files || {}) {
       if (media_fields.includes(field)) {
+        // console.log("field going to be cahnged: ", field);
         // Delete "resume" field in student. ie. by setting resume: null
         const edited_student = await strapi.db
           .query("api::student.student")
@@ -286,14 +309,16 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
             },
           });
         // console.debug(edited_student);
-
+        
         // Rename the file as `resume.pdf`
         if (field == "resume") {
           ctx.request.files[field].name = `${roll}.pdf`;
         }
-        files_to_upload[`files.${field}`] = ctx.request.files[field];
+        files_to_upload[`files.${field}`] = files[field];
       }
     }
+
+    // console.log("media files to upload; ", files_to_upload)
     ctx.request.files = files_to_upload;
 
     // Modifying ctx.params according to input format taken by this.update function
@@ -304,9 +329,9 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
 
     // NOTE: Not allowing any user given query to pass through
     ctx.request.query = {};
-
+    
     // console.log("Earlier, ctx.query", { q: ctx.query });
-
+    
     // NOTE: Internally in strapi this 1 signifies replaceFile, it is like this in
     // node_modules/@strapi/plugin-upload/server/controllers/content-api.js
     // await (ctx.query.id ? this.replaceFile : this.uploadFiles)(ctx);
@@ -314,18 +339,71 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
 
     ctx.request.body = {
       // NOTE: Internally, strapi expects body["data"] to be a string like "{'data': {'key1:'3434','key2':6}}"
-      data: JSON.stringify(fields_to_modify),
+      // data: JSON.stringify(fields_to_modify),
+      data:fields_to_modify
     };
 
-    // console.log("Just before update: ", { body: ctx.request.body, files: ctx.request.files });
+    // console.log('fields to modify: ', fields_to_modify)
+    
+    console.log("Just before update: ", { 
+      documentId:ctx.state.user.documentId,
+          data:ctx.request.body.data,
+          files: ctx.request.files,
+     });
+    // console.log('ctx: ', ctx);
 
-    if (fields_to_modify === {}) { // No fields to modify, ill resolve later
+    // console.log('update: ', this);
+    console.log("student api: ", ctx.state.user)
+
+    if (Object.keys(fields_to_modify).length === 0 && (!files || Object.keys(files).length === 0)) {
       ctx.response.status = 204;
       return (ctx.body = "No field modified");
-    } else {
-      // Pass to the `update` callback to handle request
-      return this.update(ctx);
     }
+  
+ ///---------------------------------------------------------------------
+    const updatedStudent = await strapi.entityService.update("api::student.student", id, {
+      data: fields_to_modify,
+      files:files_to_upload
+    });
+  
+    console.log("Updated student:", updatedStudent.profile_pic);
+
+   const published  =  await strapi.documents('api::student.student').publish({
+      documentId: ctx.state.user.documentId,
+    });
+
+    console.log('publsihed: ', published)
+  
+    return published;
+
+
+  //----------------------------------------
+/*
+      // Pass to the `update` callback to handle request
+      try {
+        const res = await strapi.documents('api::student.student').update({
+          // documentId:ctx.state.user.documentId,
+          documentId: 'ejr12ufa4qk4wlh9z02hfe86',
+          // id:id,
+          // data:ctx.request.body.data,
+          // files: ctx.request.files,
+          // name:"sahitya bro",
+          data:{
+            name:'sahitya bro'
+          },
+          status:'published'
+        });
+        // const res  = this.update(ctx);
+  
+      console.log("final response; ", res);
+      return res;  
+      } catch (err) {
+        console.log("error response which modifying: ", err);
+        return err;
+    }
+
+    */
+
   },
 
   /**
@@ -841,6 +919,7 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
 
   async getProfilePicUrl(ctx) {
     const { email } = ctx.request.body;
+    console.log("emai: ", email)
     if(!email){
       return ctx.badRequest(null, [
         { messages: [{ id: "Email not passed" }] },
@@ -852,10 +931,13 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       },
       populate: true
     });
+
+    // console.log("profile studenbt: ", student);
     if (!student) {
       return ctx.notFound('Student not found');
     }
     const profilePicUrl = student.profile_pic
+    console.log("profile pic: ", profilePicUrl)
     return { profilePicUrl };
   },
 }));
