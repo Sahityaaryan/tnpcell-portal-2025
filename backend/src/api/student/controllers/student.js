@@ -173,6 +173,8 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       },
       select: ["id", "approved"],
     });
+
+    // console.log("student data: ", student_data)
     if (!student_data) {
       // Returning 500, since this should not fail, it's just reading data of an existing user (as they have been provided the JWT)
       return ctx.internalServerError(null, [
@@ -238,7 +240,7 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
     // NOTE: ALL other fields (including invalid/unknown) are removed, and treated as immutable
     // for changing password, use forgot password
     // NOTE2: Other approach can be allowing all except some
-    const fields_to_modify = {};
+    let fields_to_modify = {};
     
     for (const field in body) {
       // These fields will only be added to `fields_to_modify` if account is not already approved/rejected;
@@ -295,7 +297,7 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
      * NOTE: This needs to be updated with every media field added to student schema
      */
     const media_fields = ["resume", "profile_pic","casteCertificate", "tenthCertificate", "twelthCertificate", "aadharCard", "panCard", "drivingLicence", "disabilityCertificate", "allSemMarksheet"];
-    const files_to_upload = {};
+    let files_to_upload = {};
     for (const field in files || {}) {
       if (media_fields.includes(field)) {
         // console.log("field going to be cahnged: ", field);
@@ -343,17 +345,19 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       data:fields_to_modify
     };
 
+
+
     // console.log('fields to modify: ', fields_to_modify)
     
-    console.log("Just before update: ", { 
-      documentId:ctx.state.user.documentId,
-          data:ctx.request.body.data,
-          files: ctx.request.files,
-     });
+    // console.log("Just before update: ", { 
+    //   documentId:ctx.state.user.documentId,
+    //       data:ctx.request.body.data,
+    //       files: ctx.request.files,
+    //  });
     // console.log('ctx: ', ctx);
 
     // console.log('update: ', this);
-    console.log("student api: ", ctx.state.user)
+    // console.log("student api: ", ctx.state.user)
 
     if (Object.keys(fields_to_modify).length === 0 && (!files || Object.keys(files).length === 0)) {
       ctx.response.status = 204;
@@ -361,22 +365,33 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
     }
   
  ///---------------------------------------------------------------------
-    const updatedStudent = await strapi.entityService.update("api::student.student", id, {
-      data: fields_to_modify,
-      files:files_to_upload
-    });
-  
-    console.log("Updated student:", updatedStudent.profile_pic);
+ const uploadedFiles = {};
 
-   const published  =  await strapi.documents('api::student.student').publish({
-      documentId: ctx.state.user.documentId,
-    });
+ for (const field in files_to_upload) {
+   const file = files_to_upload[field];
+   const uploaded = await strapi.plugins["upload"].services.upload.upload({
+     data: {},
+     files: file,
+   });
+  //  console.log("uploaded: ", uploaded)
+ 
+   if (uploaded && uploaded.length > 0) {
+     uploadedFiles[field.substring(6)] = uploaded[0]; // Store uploaded file ID to update student record
+   }
+ }
 
-    console.log('publsihed: ', published)
-  
-    return published;
+//  console.log("uploaded files: ",uploadedFiles)
+ 
+ // Merge uploaded files into fields_to_modify
+ fields_to_modify = { ...fields_to_modify, ...uploadedFiles };
+ 
+ // Now update the student record
+ const updatedStudent = await strapi.entityService.update("api::student.student", id, {
+   data: fields_to_modify,
+ });
+//  console.log('prfile pic; ', updatedStudent.profile_pic)
 
-
+ return updatedStudent;
   //----------------------------------------
 /*
       // Pass to the `update` callback to handle request
@@ -919,7 +934,7 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
 
   async getProfilePicUrl(ctx) {
     const { email } = ctx.request.body;
-    console.log("emai: ", email)
+    // console.log("emai: ", email)
     if(!email){
       return ctx.badRequest(null, [
         { messages: [{ id: "Email not passed" }] },
@@ -937,7 +952,6 @@ module.exports = createCoreController("api::student.student", ({ strapi }) => ({
       return ctx.notFound('Student not found');
     }
     const profilePicUrl = student.profile_pic
-    console.log("profile pic: ", profilePicUrl)
     return { profilePicUrl };
   },
 }));
