@@ -4,6 +4,16 @@
  * A set of functions called "actions" for `auth`
  */
 
+function isHashed(str){
+  const regex = /\$.*?\$.*?\$.*?\$.*?/;
+
+  if(typeof(str) === 'string'){
+    return regex.test(str);
+  }
+  return false;
+}
+
+
 module.exports = {
   /**
    * @description Route to reset password
@@ -59,7 +69,7 @@ from the database based on the provided username and returns it in an object.
     // Throw an error if the new password selected by the user
     // contains more than three times the symbol '$'.
     if (
-      strapi.service('plugin::users-permissions.user').isHashed(new_pass)
+      isHashed(new_pass)
     ) {
       throw new ValidationError(
         'Your password cannot contain more than three times the symbol `$`'

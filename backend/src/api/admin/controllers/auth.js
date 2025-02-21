@@ -64,6 +64,15 @@ const registerBodySchema = yup.object().shape({
 
 const validateRegisterBody = validateYupSchema(registerBodySchema);
 
+function isHashed(str){
+  const regex = /\$.*?\$.*?\$.*?\$.*?/;
+
+  if(typeof(str) === 'string'){
+    return regex.test(str);
+  }
+  return false;
+}
+
 // JWT issuer
 
 function issueJWT(payload, jwtOptions = {}) {
@@ -116,7 +125,7 @@ module.exports = {
     // Throw an error if the password selected by the user
     // contains more than three times the symbol '$'.
     if (
-      strapi.service("plugin::users-permissions.user").isHashed(params.password)
+      isHashed(params.password)
     ) {
       throw new ValidationError(
         "Your password cannot contain more than three times the symbol `$`",
