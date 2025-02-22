@@ -6,7 +6,7 @@
  */
 'use strict';
 
-const _ = require('lodash');
+const _ = require('lodash/fp');
 const jwt = require('jsonwebtoken');
 const utils = require('@strapi/utils');
 const { sanitize } = utils;

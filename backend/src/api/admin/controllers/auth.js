@@ -23,7 +23,7 @@ If the user role is not provided or the role is admin, the code will throw a val
 
 "use strict";
 
-const _ = require("lodash");
+const _ = require("lodash/fp");
 
 const jwt = require("jsonwebtoken");
 
@@ -44,6 +44,7 @@ async function sanitizeUser(user, ctx) {
   const { role } = user;
 
   const { auth } = ctx.state;
+
 
   const userSchema = strapi.getModel("plugin::users-permissions.user");
 

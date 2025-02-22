@@ -8,7 +8,7 @@
  * run jobs, or perform some special logic.
  */
 const crypto = require('crypto');
-const _ = require('lodash');
+const _ = require('lodash/fp');
 
 const { getService } = require('../utils');
 const usersPermissionsActions = require('./users-permissions-actions');
