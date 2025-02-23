@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@strapi/plugin-users-permissions": "^5.10.3",
+    "@strapi/provider-email-nodemailer": "^5.10.3",
     "@strapi/strapi": "5.9.0",
     "adm-zip": "^0.5.16",
     "better-sqlite3": "11.3.0",
@@ -20,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.27",
+    "nodemailer": "^6.10.0",
     "pg": "^8.13.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
