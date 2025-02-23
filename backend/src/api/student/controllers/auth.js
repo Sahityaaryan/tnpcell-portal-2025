@@ -6,6 +6,7 @@
  */
 'use strict';
 
+const {omit} = require('lodash/fp');
 const _ = require('lodash/fp');
 const jwt = require('jsonwebtoken');
 const utils = require('@strapi/utils');
@@ -114,16 +115,25 @@ module.exports = {
       throw new ApplicationError('Register action is currently disabled');
     }
 
+    // console.log("omit: ", omit(ctx.request.body, []))
+    // console.log("body: ", ctx.request.body)
+
+    // const params = {
+    //   ..._.omit(ctx.request.body, [
+    //     'confirmed',
+    //     'confirmationToken',
+    //     'resetPasswordToken',
+    //   ]),
+    //   provider: 'local',
+    // };
+
+
     const params = {
-      ..._.omit(ctx.request.body, [
-        'confirmed',
-        'confirmationToken',
-        'resetPasswordToken',
-      ]),
+      ...ctx.request.body,
       provider: 'local',
     };
 
-    await validateRegisterBody(params);
+     await validateRegisterBody(params);
 
     // Throw an error if the password selected by the user
     // contains more than three times the symbol '$'.
